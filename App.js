@@ -23,7 +23,8 @@ const defaultState = {
   latitude: '',
   longitude: '',
   businesses: [],
-  animated: false
+  animated: false,
+  showLocate: false
 }
 
 export default class HomeScreen extends React.Component {
@@ -46,7 +47,7 @@ export default class HomeScreen extends React.Component {
 
       this.setState({ latitude, longitude }, this.getBusinesses)
     } else {
-      throw new Error('Location permission not granted')
+      this.setState({ showLocate: true })
     }
   }
 
@@ -64,10 +65,11 @@ export default class HomeScreen extends React.Component {
 
     const res = await fetch(`https://api.yelp.com/v3/businesses/search?latitude=${this.state.latitude}&longitude=${this.state.longitude}`, body)
     let { businesses } = await res.json()
-    businesses = sortOn(businesses, 'distance')
     // const { businesses } = fixture
 
-    this.setState({ businesses })
+    businesses = sortOn(businesses, 'distance')
+
+    this.setState({ businesses, showLocate: false })
   }
 
   render () {
@@ -106,6 +108,8 @@ export default class HomeScreen extends React.Component {
               )
           })
         }
+
+        {this.state.showLocate ? <Button onPress={this.getLocationAsync} title='locate' /> : null}
         </ScrollContainer>
       </Container>
     )
