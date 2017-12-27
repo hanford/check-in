@@ -4,6 +4,7 @@ import kmToM from 'km-m'
 import sortOn from 'sort-on'
 
 import { yelp } from './config'
+import fixture from './fixture'
 
 import {
   Image,
@@ -22,9 +23,7 @@ import { Location, Permissions, BlurView } from 'expo'
 const defaultState = {
   latitude: '',
   longitude: '',
-  businesses: [],
-  animated: false,
-  showLocate: false
+  businesses: []
 }
 
 export default class HomeScreen extends React.Component {
@@ -33,7 +32,6 @@ export default class HomeScreen extends React.Component {
   }
 
   state = defaultState
-
 
   async componentDidMount () {
     await this.getLocationAsync()
@@ -47,7 +45,9 @@ export default class HomeScreen extends React.Component {
 
       this.setState({ latitude, longitude }, this.getBusinesses)
     } else {
-      this.setState({ showLocate: true })
+      const { businesses } = fixture
+
+      this.setState({ businesses })
     }
   }
 
@@ -65,7 +65,6 @@ export default class HomeScreen extends React.Component {
 
     const res = await fetch(`https://api.yelp.com/v3/businesses/search?latitude=${this.state.latitude}&longitude=${this.state.longitude}`, body)
     let { businesses } = await res.json()
-    // const { businesses } = fixture
 
     businesses = sortOn(businesses, 'distance')
 
@@ -84,33 +83,41 @@ export default class HomeScreen extends React.Component {
 
     return (
       <Container>
-        <ScrollContainer>
-          {
-            this.state.businesses.map((place, index) => {
-              const uri = place.image_url === '' ? this.state.businesses[index - 1].image_url : place.image_url
+        <Text>{this.state.latitude} {this.state.longitude}</Text>
 
-              return (
-                <Item
-                  onPress={() => this.visit(place)}
-                  key={place.name}
-                >
-                  <View style={{ flex: 1 }}>
-                    <Preview source={{ uri }} />
-                    <BlurView tint='dark' intensity={95} style={StyleSheet.absoluteFill}>
-                      <Info>
-                        <Title>{place.name}</Title>
-                        <Subtitle>{place.review_count} reviews</Subtitle>
-                        <Subtitle>{kmToM(place.distance / 1000).toFixed(0)} miles away</Subtitle>
-                      </Info>
-                    </BlurView>
-                  </View>
-                </Item>
-              )
-          })
+        {
+          this.state.businesses.length
+            ? (
+              <ScrollContainer>
+                {
+                  this.state.businesses.map((place, index) => {
+                    const uri = place.image_url === '' ? this.state.businesses[index - 1].image_url : place.image_url
+
+                    return (
+                      <Item
+                        onPress={() => this.visit(place)}
+                        key={place.name}
+                      >
+                        <View style={{ flex: 1 }}>
+                          <Preview source={{ uri }} />
+                          <BlurView tint='dark' intensity={95} style={StyleSheet.absoluteFill}>
+                            <Info>
+                              <Title>{place.name}</Title>
+                              <Subtitle>{place.review_count} reviews</Subtitle>
+                              <Subtitle>{kmToM(place.distance / 1000).toFixed(0)} miles away</Subtitle>
+                            </Info>
+                          </BlurView>
+                        </View>
+                      </Item>
+                    )
+                  })
+                }
+              </ScrollContainer>
+            )
+          : null
         }
 
-        {this.state.showLocate ? <Button onPress={this.getLocationAsync} title='locate' /> : null}
-        </ScrollContainer>
+       {this.state.businesses.length === 0 ? <Button onPress={this.getLocationAsync} title='Locate' /> : null}
       </Container>
     )
   }
