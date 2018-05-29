@@ -4,12 +4,12 @@
   "scripts": {},
   "dependencies": {
     "@expo/samples": "2.1.1",
-    "expo": "~24.0.0",
     "km-m": "~1.0.0",
-    "react": "16.0.0",
-    "react-native": "https://github.com/expo/react-native/archive/sdk-24.0.0.tar.gz",
-    "react-navigation": "~1.0.0-beta.21",
+    "react-navigation": "~1.5.12",
     "sort-on": "~2.0.0",
-    "styled-components": "~2.4.0"
+    "styled-components": "~2.4.0",
+    "expo": "~27.0.1",
+    "react": "16.3.1",
+    "react-native": "https://github.com/expo/react-native/archive/sdk-27.0.0.tar.gz"
   }
 }
